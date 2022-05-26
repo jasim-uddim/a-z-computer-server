@@ -67,7 +67,7 @@ async function run() {
     app.put("/user/admin/:email", async (req, res) => {
       const email = req.params.email;
       const role = req.query.role;
-      // return console.log(role);
+      // return console.log(ro le);
       const filter = { email: email };
       if (role === "Admin") {
         const updateDoc = {
