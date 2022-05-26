@@ -43,12 +43,45 @@ async function run() {
     const serviceCollection = client.db("a_z_computer").collection("services");
     const orderCollection = client.db("a_z_computer").collection("order");
     const reviewCollection = client.db("a_z_computer").collection("reviews");
+    const userCollection = client.db("a_z_computer").collection("users");
 
     app.get("/service", async (req, res) => {
       const query = {};
       const cursor = serviceCollection.find(query);
       const service = await cursor.toArray();
       res.send(service);
+    });
+
+    app.get("/user", async (req, res) => {
+      const users = await userCollection.find().toArray();
+      res.send(users);
+    });
+
+    app.get("/admin/:email", async (req, res) => {
+      const email = req.params.email;
+      const user = await userCollection.findOne({ email: email });
+      const isAdmin = user.role === "Admin";
+      res.send({ admin: isAdmin });
+    });
+
+    app.put("/user/admin/:email", async (req, res) => {
+      const email = req.params.email;
+      const role = req.query.role;
+      // return console.log(role);
+      const filter = { email: email };
+      if (role === "Admin") {
+        const updateDoc = {
+          $set: { role: "User" },
+        };
+        const result = await userCollection.updateOne(filter, updateDoc);
+        res.send(result);
+      } else {
+        const updateDoc = {
+          $set: { role: "Admin" },
+        };
+        const result = await userCollection.updateOne(filter, updateDoc);
+        res.send(result);
+      }
     });
 
     app.post("/orders", async (req, res) => {
